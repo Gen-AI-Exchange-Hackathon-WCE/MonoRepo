@@ -1,0 +1,230 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+  ARTIST
+  INVESTOR
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  role         UserRole
+  email        String   @unique
+  phoneNumber  String?
+  address      String?
+  profilePhoto String?
+  password     String
+  registeredOn DateTime @default(now())
+
+  artist   Artist?   @relation("UserToArtist")
+  investor Investor?
+}
+
+model Artist {
+  artistId  Int      @id
+  createdAt DateTime @default(now())
+
+  user                       User                        @relation("UserToArtist", fields: [artistId], references: [id])
+  profile                    ArtistProfile?              @relation("ArtistToProfile")
+  backgroundImageGenerations BackgroundImageGeneration[]
+  investorInterests          InvestorInterest[]
+  productCategories          ProductCategories[]
+  courses                    Course[] @relation("ArtistToCourse")
+}
+
+model ArtistProfile {
+  id               Int      @id @default(autoincrement())
+  artistId         Int      @unique
+  professionCode   Int
+  businessName     String?
+  businessLocation String
+  profilePhoto     String   @default("https://res.cloudinary.com/durmfn82k/image/upload/v1758207360/artist_profiles/artist_2_profile_photo_1758207367173.jpg")
+  backgroundPoster String
+  backgroundVideos String[]
+  badgeIds         Int[]
+  createdAt        DateTime @default(now())
+
+  artist       Artist               @relation("ArtistToProfile", fields: [artistId], references: [artistId])
+  profession   Profession           @relation(fields: [professionCode], references: [code])
+  descriptions ProfileDescription[] @relation("ProfileToDescriptions")
+}
+
+model Course {
+  id          Int      @id @default(autoincrement())
+  artistId    Int
+  title       String
+  description String?
+  thumbnail   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  artist Artist  @relation("ArtistToCourse",fields: [artistId], references: [artistId])
+  videos Video[] @relation("CourseToVideo")
+}
+
+model Video {
+  id          Int      @id @default(autoincrement())
+  courseId    Int
+  title       String
+  description String?
+  url         String   
+  thumbnail   String?
+  tags        String[]
+  views       Int      @default(0)
+  likes       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  course Course @relation("CourseToVideo",fields: [courseId], references: [id])
+}
+
+model ProfileDescription {
+  id                  Int      @id @default(autoincrement())
+  profileId           Int
+  location            String
+  backgroundInfo      String
+  experience          String
+  descriptionMarkdown String
+  descriptionText     String
+  createdAt           DateTime @default(now())
+  isActive            Boolean  @default(false)
+
+  profile ArtistProfile @relation("ProfileToDescriptions", fields: [profileId], references: [id])
+}
+
+model Profession {
+  code        Int     @id @default(autoincrement())
+  name        String
+  description String?
+  iconUrl     String?
+
+  artistProfiles ArtistProfile[]
+  investors      Investor[]
+}
+
+model BackgroundImageGeneration {
+  id        Int      @id @default(autoincrement())
+  artistId  Int
+  status    String   @default("pending")
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  artist Artist @relation(fields: [artistId], references: [artistId])
+}
+
+model ProductCategories {
+  id                  Int     @id @default(autoincrement())
+  artistId            Int
+  categoryName        String
+  categoryDescription String?
+  categoryIcon        String?
+
+  artist   Artist     @relation(fields: [artistId], references: [artistId])
+  products Products[]
+}
+
+model Products {
+  id                    Int      @id @default(autoincrement())
+  categoryId            Int
+  productName           String
+  productDescription    String
+  generatedDescription  String?
+  basePrice             Float
+  isDescriptionAccepted Boolean  @default(false)
+  keywords              String[]
+
+  productMedia ProductMedia[]
+  variants     ProductVariant[]
+  category     ProductCategories @relation(fields: [categoryId], references: [id])
+}
+
+model ProductVariant {
+  id           Int      @id @default(autoincrement())
+  productId    Int
+  size         String?
+  color        String?
+  materialType String?
+  dimensions   Json?
+  price        Float?
+  stock        Int
+  createdAt    DateTime @default(now())
+
+  product Products @relation(fields: [productId], references: [id])
+}
+
+model ProductMedia {
+  id            Int      @id @default(autoincrement())
+  productId     Int
+  imageUrl      String
+  genereatedUrl String?
+  mediaType     String   @default("image")
+  altText       String?
+  caption       String?
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  productImageGeneration ProductImageGeneration[]
+  products               Products                 @relation(fields: [productId], references: [id])
+}
+
+model ProductImageGeneration {
+  id             Int      @id @default(autoincrement())
+  productMediaId Int
+  status         String   @default("pending")
+  imageUrl       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  productMedia ProductMedia @relation(fields: [productMediaId], references: [id])
+}
+
+model Investor {
+  id                  Int     @id @default(autoincrement())
+  name                String
+  email               String  @unique
+  phone               String? @unique
+  investmentFocusCode Int?
+  organization        String?
+  minInvestment       Float?
+  maxInvestment       Float?
+  location            String?
+  description         String?
+  website             String?
+  linkedInUrl         String?
+
+  interests       InvestorInterest[]
+  investmentFocus Profession?        @relation(fields: [investmentFocusCode], references: [code])
+  user            User               @relation(fields: [id], references: [id])
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+}
+
+model InvestorInterest {
+  id         Int      @id @default(autoincrement())
+  artistId   Int
+  investorId Int
+  message    String?
+  status     String   @default("PENDING")
+  createdAt  DateTime @default(now())
+
+  artist   Artist   @relation(fields: [artistId], references: [artistId])
+  investor Investor @relation(fields: [investorId], references: [id])
+}

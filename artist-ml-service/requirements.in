@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-dotenv
+google-cloud-aiplatform
+requests
+markdown2
+beautifulsoup4
+pillow
+cloudinary

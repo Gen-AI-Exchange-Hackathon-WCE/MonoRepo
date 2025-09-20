@@ -1,0 +1,41 @@
+const artistProfileId = 1; // Replace with the actual ID of the Potter artist profile
+
+// Insert multiple descriptions for this profile
+await prisma.profileDescription.createMany({
+  data: [
+    {
+      profileId: artistProfileId,
+      location: "Jaipur, India",
+      backgroundInfo: "Started pottery as a hobby during college years.",
+      experience: "2 years",
+      descriptionMarkdown: "Worked on handmade pottery items.",
+      descriptionText:
+        "Started pottery as a hobby during college years and sold items locally.",
+      createdAt: new Date("2022-01-15"),
+      isActive: false,
+    },
+    {
+      profileId: artistProfileId,
+      location: "Jaipur, India",
+      backgroundInfo: "Expanded pottery business to regional exhibitions.",
+      experience: "3 years",
+      descriptionMarkdown: "Participated in exhibitions and fairs.",
+      descriptionText:
+        "Expanded business and participated in several regional exhibitions and fairs.",
+      createdAt: new Date("2023-03-10"),
+      isActive: false,
+    },
+    {
+      profileId: artistProfileId,
+      location: "Jaipur, India",
+      backgroundInfo: "Now leading a pottery studio with apprentices.",
+      experience: "5 years",
+      descriptionMarkdown:
+        "Training apprentices and managing studio operations.",
+      descriptionText:
+        "Currently leading a pottery studio, mentoring apprentices, and handling large orders.",
+      createdAt: new Date("2024-08-20"),
+      isActive: true,
+    },
+  ],
+});

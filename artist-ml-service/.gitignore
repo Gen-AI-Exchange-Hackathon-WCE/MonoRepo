@@ -139,4 +139,31 @@ cython_debug/
 
 requirements.txt
 service-account.json
+
+# Machine Learning specific
+models/
+*.pkl
+*.joblib
+*.h5
+*.hdf5
+*.pb
+*.onnx
+data/
+datasets/
+checkpoints/
+logs/
+tensorboard/
+wandb/
+
+# Google Cloud
+credentials.json
+service-account-key.json
+
+# FastAPI
+.uvicorn-pid
+
+# Image uploads
+uploads/
+public/uploads/
+
 # End of https://mrkandreev.name/snippets/gitignore-generator/#Python

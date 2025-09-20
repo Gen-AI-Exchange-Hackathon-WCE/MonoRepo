@@ -1,0 +1,23 @@
+  // Example seed data for professions
+  await prisma.profession.create({
+    data: {
+      name: "Potter",
+      description: "Creates pottery items such as pots, vases, and ceramics.",
+    },
+  });
+
+  await prisma.profession.create({
+    data: {
+      name: "Carpenter",
+      description:
+        "Expert in woodworking, constructing and repairing structures made of wood.",
+    },
+  });
+
+  await prisma.profession.create({
+    data: {
+      name: "Painter",
+      description:
+        "Specializes in applying paint, coatings, and finishes to surfaces.",
+    },
+  });
