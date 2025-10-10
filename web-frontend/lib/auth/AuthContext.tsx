@@ -98,15 +98,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
             setUser(response.data);
 
-            // Redirect based on user role
-            if (response.data.role === "ARTIST") {
-                router.push("/dashboard");
-            } else if (response.data.role === "INVESTOR") {
-                router.push("/investor-dashboard");
-            } else {
-                router.push("/customer-dashboard");
-            }
-
+            router.push("/auth/login");
             return { success: true };
         } catch (error: any) {
             return {
